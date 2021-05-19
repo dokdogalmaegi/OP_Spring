@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -41,8 +44,20 @@ public class StudentController {
 
     @GetMapping("/get/{test}")
     public String getTest(@PathVariable("test") String test) {
+        String raw = getNowTime();
 
+        String hex = "";
 
-        return "Hello World! " + test + " " + getNowTime();
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+            md.update(raw.getBytes());
+
+            hex = String.format("%064x", new BigInteger(1, md.digest()));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        return hex;
+//        return "Hello World! " + test + " " + getNowTime();
     }
 }
