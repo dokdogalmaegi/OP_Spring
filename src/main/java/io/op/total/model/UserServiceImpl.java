@@ -20,4 +20,6 @@ public class UserServiceImpl implements UserService {
     public List<Map<String, Object>> getLogs() {
         return userRepository.getLogs();
     }
+
+    public int insertLog(String email) { return userRepository.insertLog(email); }
 }

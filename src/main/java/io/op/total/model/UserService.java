@@ -10,4 +10,5 @@ public interface UserService {
 
     List<Map<String, Object>> getUsers();
     List<Map<String, Object>> getLogs();
+    int insertLog(String email);
 }

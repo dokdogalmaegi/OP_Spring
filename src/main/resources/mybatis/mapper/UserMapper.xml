@@ -10,7 +10,7 @@
   <select id="getLogs" resultType="java.util.HashMap">
     SELECT * FROM log;
   </select>
-  <insert id="addLog">
+  <insert id="insertLog" parameterType="String">
     insert into log(email, join_date) values (#{email}, now())
   </insert>
 </mapper>

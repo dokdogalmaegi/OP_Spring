@@ -13,4 +13,5 @@ import java.util.Map;
 public interface UserRepository {
     List<Map<String, Object>> getUsers();
     List<Map<String, Object>> getLogs();
+    int insertLog(String email);
 }

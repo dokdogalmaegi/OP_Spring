@@ -1,6 +1,7 @@
 package io.op.total.controller;
 
 import io.op.total.model.UserService;
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,5 +63,12 @@ public class StudentController {
         } else {
             return "값이 일치 하지 않습니다.";
         }
+    }
+
+    @GetMapping("/set/{email}")
+    public String insertTest(@PathVariable("email") String email) {
+        userService.insertLog(email);
+
+        return "성공 " + email;
     }
 }
