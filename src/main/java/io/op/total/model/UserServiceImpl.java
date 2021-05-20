@@ -1,6 +1,7 @@
 package io.op.total.model;
 
 import io.op.total.domain.UserRepository;
+import io.op.total.vo.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +26,9 @@ public class UserServiceImpl implements UserService {
 
     public List<Map<String, Object>> checkToDayLog(String email) { return userRepository.checkToDayLog(email); }
 
+    public List<Map<String, Object>> checkAdmin(String email, String adminKey) { return userRepository.checkAdmin(email, adminKey); }
+
     public int insertLog(String email) { return userRepository.insertLog(email); }
+
+    public int insertStudent(Student vo) { return userRepository.insertStudent(vo); }
 }
