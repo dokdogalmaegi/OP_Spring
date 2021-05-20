@@ -13,13 +13,17 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public List<Map<String, Object>> getUsers() {
-        return userRepository.getUsers();
-    }
+    public List<Map<String, Object>> getUsers() { return userRepository.getUsers(); }
+
+    public List<Map<String, Object>> getNowLogs() { return userRepository.getNowLogs(); }
 
     public List<Map<String, Object>> getLogs() {
         return userRepository.getLogs();
     }
+
+    public List<Map<String, Object>> checkStudent(String email, String pw) { return userRepository.checkStudent(email, pw); }
+
+    public List<Map<String, Object>> checkToDayLog(String email) { return userRepository.checkToDayLog(email); }
 
     public int insertLog(String email) { return userRepository.insertLog(email); }
 }

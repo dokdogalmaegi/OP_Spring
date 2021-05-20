@@ -5,10 +5,19 @@
 
 <mapper namespace="io.op.total.domain.UserRepository">
   <select id="getUsers" resultType="java.util.HashMap">
-    SELECT * FROM user;
+    SELECT email, nm, grade, num FROM user;
   </select>
   <select id="getLogs" resultType="java.util.HashMap">
-    SELECT * FROM log;
+    select nm, l.email, grade, num, join_date from log l inner join user u on l.email = u.email;
+  </select>
+  <select id="getNowLogs" resultType="java.util.HashMap">
+    select nm, l.email, grade, num, join_date from log l inner join user u on l.email = u.email where join_date like concat(DATE_FORMAT(now(), '%Y-%m-%d'), '%');
+  </select>
+  <select id="checkStudent" parameterType="String" resultType="java.util.HashMap">
+    select * from user where email = #{email} and pw = #{pw};
+  </select>
+  <select id="checkToDayLog" parameterType="String" resultType="java.util.HashMap">
+    select * from log where email = #{email} and join_date like concat(DATE_FORMAT(now(), '%Y-%m-%d'), '%');
   </select>
   <insert id="insertLog" parameterType="String">
     insert into log(email, join_date) values (#{email}, now())
