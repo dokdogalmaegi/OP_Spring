@@ -11,26 +11,39 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/")
 public class StudentController {
-    public String getNowTime() {
+    @Autowired
+    private UserService userService;
+
+    public Boolean checkDate(String now) {
         Calendar cal = Calendar.getInstance();
         Date d = new Date(cal.getTimeInMillis());
         SimpleDateFormat testDate = new SimpleDateFormat("yyyyMMdd");
 
-        String result = testDate.format(d);
+        String nowDate = testDate.format(d);
 
-        return result;
+        nowDate = nowDate + userService.solt;
+
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+            md.update(nowDate.getBytes());
+
+            String baseString = Base64.getEncoder().encodeToString(md.digest());
+
+            if(baseString.equals(now)) {
+                return true;
+            }
+
+            return false;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-
-    @Autowired
-    private UserService userService;
 
     @GetMapping("/getStudent")
     public List<Map<String, Object>> getUsers() {
@@ -42,22 +55,12 @@ public class StudentController {
         return userService.getLogs();
     }
 
-    @GetMapping("/get/{test}")
-    public String getTest(@PathVariable("test") String test) {
-        String raw = getNowTime();
-
-        String hex = "";
-
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.update(raw.getBytes());
-
-            hex = String.format("%064x", new BigInteger(1, md.digest()));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+    @GetMapping("/get/{nowDay}")
+    public String getTest(@PathVariable("nowDay") String nowDay) {
+        if(checkDate(nowDay)) {
+            return "값이 일치 합니다.";
+        } else {
+            return "값이 일치 하지 않습니다.";
         }
-
-        return hex;
-//        return "Hello World! " + test + " " + getNowTime();
     }
 }
