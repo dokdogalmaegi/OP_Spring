@@ -15,7 +15,7 @@ configurations {
 }
 
 bootJar {
-    archiveVersion = "0.0.4"
+    archiveVersion = "0.0.5"
 }
 
 repositories {

@@ -59,6 +59,28 @@ public class StudentController {
         return result;
     }
 
+    public Map kakaoChat(String simpleText) {
+        Map result = new HashMap<String, Object>();
+        Map outputs = new HashMap<String, Object>();
+        Map simpleTextMap = new HashMap<String, Object>();
+        Map textMap = new HashMap<String, Object>();
+        result.put("version", "2.0");
+
+        List<Map<String, Object>> sqlMap = userService.getNowLogs();
+
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        textMap.put("text", simpleText);
+        simpleTextMap.put("simpleText", textMap);
+
+        list.add(simpleTextMap);
+
+        outputs.put("outputs", list);
+        result.put("template", outputs);
+
+        return result;
+    }
+
     @GetMapping("/getStudent")
     public List<Map<String, Object>> getUsers() { return userService.getUsers(); }
 
@@ -69,32 +91,18 @@ public class StudentController {
 
     @PostMapping("/getNowLogs")
     public Map getNowLogs() {
-        Map result = new HashMap<String, Object>();
-        Map outputs = new HashMap<String, Object>();
-        String simpleText = "";
+        List<Map<String, Object>> sqlMap = userService.getNowLogs();
+        String simpleText = " 이름   | 출석시간\n";
 
-        List<Map<String, Object>> resultMap = userService.getNowLogs();
+        int count = 0;
 
-        result.put("version", "2.0");
-        List<Map<String, Object>> list = new ArrayList<>();
-
-        for(Map<String, Object> vo : resultMap) {
-            simpleText += vo.get("nm").toString() + " " + vo.get("time").toString() + "\n";
+        for(Map<String, Object> vo : sqlMap) {
+            if(count == sqlMap.size() - 1) simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString();
+            else simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString() + "\n";
+            count++;
         }
 
-        Map test = new HashMap<String, Object>();
-        Map test2 = new HashMap<String, Object>();
-
-        test2.put("text", simpleText);
-
-        test.put("simpleText", test2);
-
-        list.add(0, test);
-
-        outputs.put("outputs", list);
-        result.put("template", outputs);
-
-        return result;
+        return kakaoChat(simpleText);
     }
 
     // 학생 추가 - Admin Client 전용
