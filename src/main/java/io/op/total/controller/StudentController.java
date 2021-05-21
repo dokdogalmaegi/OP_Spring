@@ -67,9 +67,37 @@ public class StudentController {
         return userService.getLogs();
     }
 
-    @GetMapping("/getNowLogs")
-    public List<Map<String, Object>> getNowLogs() { return userService.getNowLogs(); }
+    @PostMapping("/getNowLogs")
+    public Map getNowLogs() {
+        Map result = new HashMap<String, Object>();
+        Map outputs = new HashMap<String, Object>();
+        String simpleText = "";
 
+        List<Map<String, Object>> resultMap = userService.getNowLogs();
+
+        result.put("version", "2.0");
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        for(Map<String, Object> vo : resultMap) {
+            simpleText += vo.get("nm").toString() + " " + vo.get("time").toString() + "\n";
+        }
+
+        Map test = new HashMap<String, Object>();
+        Map test2 = new HashMap<String, Object>();
+
+        test2.put("text", simpleText);
+
+        test.put("simpleText", test2);
+
+        list.add(0, test);
+
+        outputs.put("outputs", list);
+        result.put("template", outputs);
+
+        return result;
+    }
+
+    // 학생 추가 - Admin Client 전용
     @PostMapping("/addStudent")
     public Map insertStudent(@RequestBody HashMap<String, String> params) {
         Map result = new HashMap<String, Object>();
