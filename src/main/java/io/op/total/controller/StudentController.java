@@ -81,16 +81,24 @@ public class StudentController {
             return result;
         }
 
-        String email = params.get("email"); String pw = cryptoBase(params.get("pw")); String nm = params.get("nm"); int grade = Integer.parseInt(params.get("grade")); int num = Integer.parseInt(params.get("num"));
+        String email = params.get("email"); String pw = cryptoBase(params.get("pw")); String nm = params.get("nm"); int grade = Integer.parseInt(params.get("grade")); int class_num = Integer.parseInt(params.get("class_num")); int num = Integer.parseInt(params.get("num"));
 
-        if(email.equals(null) || pw.equals(null) || nm.equals(null) || Integer.toString(grade).equals(null) || Integer.toString(num).equals(null) ) {
+        if(email.equals("") || pw.equals("") || nm.equals("") || Integer.toString(grade).equals("") || Integer.toString(class_num).equals("") || Integer.toString(num).equals("") ) {
             result.put("result", "failed");
             result.put("msg", "값이 누락 되었습니다.");
 
             return result;
         }
         try {
-            Student vo = new Student(email, pw, nm, grade, num);
+
+            if(userService.checkInsertStudent(email).size() > 0) {
+                result.put("result", "failed");
+                result.put("msg", "이미 존재하는 이메일입니다.");
+
+                return result;
+            }
+
+            Student vo = new Student(email, pw, nm, grade, class_num, num);
             userService.insertStudent(vo);
 
             result.put("result", "success");

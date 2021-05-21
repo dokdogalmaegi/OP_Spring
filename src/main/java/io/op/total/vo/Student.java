@@ -8,5 +8,6 @@ public class Student {
     private @NonNull String pw;
     private @NonNull String nm;
     private @NonNull int grade;
+    private @NonNull int class_num;
     private @NonNull int num;
 }

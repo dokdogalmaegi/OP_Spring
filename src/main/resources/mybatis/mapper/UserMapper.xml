@@ -16,6 +16,9 @@
   <select id="checkStudent" parameterType="String" resultType="java.util.HashMap">
     select * from user where email = #{email} and pw = #{pw};
   </select>
+  <select id="checkInsertStudent" parameterType="String" resultType="java.util.HashMap">
+    select * from user where email = #{email};
+  </select>
   <select id="checkToDayLog" parameterType="String" resultType="java.util.HashMap">
     select * from log where email = #{email} and join_date like concat(DATE_FORMAT(now(), '%Y-%m-%d'), '%');
   </select>
@@ -26,6 +29,6 @@
     insert into log(email, join_date) values (#{email}, now())
   </insert>
   <insert id="insertStudent" parameterType="io.op.total.vo.Student">
-    insert into user values (#{email}, #{pw}, #{nm}, #{grade}, #{num});
+    insert into user values (#{email}, #{pw}, #{nm}, #{grade}, #{class_num}, #{num});
   </insert>
 </mapper>
