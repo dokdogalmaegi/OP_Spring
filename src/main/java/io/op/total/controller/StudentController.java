@@ -27,56 +27,95 @@ public class StudentController {
     }
 
     // 당일 출석한 학생 전부를 조회
-    @PostMapping("/getNowLogs")
-    public Map getNowLogs() {
+    @PostMapping("/getNowLogs/{platform}")
+    public Map getNowLogs(@PathVariable String platform) {
         List<Map<String, Object>> sqlMap = userService.getNowLogs();
-        String simpleText = " 이름   | 출석시간\n";
+        Map result = new HashMap<String, Object>();
+        if(platform.equals("kakao")) {
+            String simpleText = " 이름   | 출석시간\n";
 
-        int count = 0;
+            int count = 0;
 
-        if(sqlMap.size() > 0) {
-            for(Map<String, Object> vo : sqlMap) {
-                if(count == sqlMap.size() - 1) simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString();
-                else simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString() + "\n";
-                count++;
+            if(sqlMap.size() > 0) {
+                for(Map<String, Object> vo : sqlMap) {
+                    if(count == sqlMap.size() - 1) simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString();
+                    else simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString() + "\n";
+                    count++;
+                }
+                result = utilService.kakaoChat(simpleText);
+
+                return result;
             }
+            simpleText = "오늘 출석한 인원은 없습니다.";
+            result = utilService.kakaoChat(simpleText);
+            return result;
         }
-        simpleText = "오늘 출석한 인원은 없습니다.";
+        if(platform.equals("csharp")) {
+            result.put("Students", sqlMap);
 
-        return utilService.kakaoChat(simpleText);
+            return result;
+        }
+        result.put("result", "failed");
+        result.put("msg", "플랫폼이 선택되지 않았습니다.");
+
+        return result;
     }
 
-    @PostMapping("/getClassNowLogs")
-    public Map getClassNowLogs(@RequestBody String params) {
-        JsonParser jsonParser = new JsonParser();
+    @PostMapping("/getClassNowLogs/{platform}")
+    public Map getClassNowLogs(@RequestBody String params, @PathVariable String platform) {
+        Map result = new HashMap<String, Object>();
+        if(platform.equals("kakao")) {
+            JsonParser jsonParser = new JsonParser();
 
-        JsonElement class_num = jsonParser.parse(params)
-                .getAsJsonObject().get("action")
-                .getAsJsonObject().get("params")
-                .getAsJsonObject().get("class_num");
+            JsonElement class_num = jsonParser.parse(params)
+                    .getAsJsonObject().get("action")
+                    .getAsJsonObject().get("params")
+                    .getAsJsonObject().get("class_num");
 
-        JsonElement grade = jsonParser.parse(params)
-                .getAsJsonObject().get("action")
-                .getAsJsonObject().get("params")
-                .getAsJsonObject().get("grade");
+            JsonElement grade = jsonParser.parse(params)
+                    .getAsJsonObject().get("action")
+                    .getAsJsonObject().get("params")
+                    .getAsJsonObject().get("grade");
 
-        List<Map<String, Object>> sqlMap = userService.getClassNowLogs(grade.getAsInt(), class_num.getAsInt());
-        String simpleText = " 이름   | 출석시간\n";
+            List<Map<String, Object>> sqlMap = userService.getClassNowLogs(grade.getAsInt(), class_num.getAsInt());
+            String simpleText = " 이름   | 출석시간\n";
 
-        int count = 0;
+            int count = 0;
 
-        if(sqlMap.size() > 0) {
-            for(Map<String, Object> vo : sqlMap) {
-                if(count == sqlMap.size() - 1) simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString();
-                else simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString() + "\n";
-                count++;
+            if(sqlMap.size() > 0) {
+                for(Map<String, Object> vo : sqlMap) {
+                    if(count == sqlMap.size() - 1) simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString();
+                    else simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString() + "\n";
+                    count++;
+                }
+
+                result = utilService.kakaoChat(simpleText);
+                return result;
             }
+            simpleText = "오늘 " + grade.toString().replaceAll("\"", "") + "학년" + " " + class_num.toString().replaceAll("\"", "") + "반에 출석한 인원은 없습니다.";
+            result = utilService.kakaoChat(simpleText);
 
-            return utilService.kakaoChat(simpleText);
+            return result;
         }
-        simpleText = "오늘 " + grade + "학년" + " " + class_num + "반에 출석한 인원은 없습니다.";
+        if(platform.equals("csharp")) {
+            JsonParser jsonParser = new JsonParser();
 
-        return utilService.kakaoChat(simpleText);
+            JsonElement class_num = jsonParser.parse(params)
+                    .getAsJsonObject().get("class_num");
+
+            JsonElement grade = jsonParser.parse(params)
+                    .getAsJsonObject().get("grade");
+
+            List<Map<String, Object>> sqlMap = userService.getClassNowLogs(grade.getAsInt(), class_num.getAsInt());
+
+            result.put("Students", sqlMap);
+
+            return result;
+        }
+        result.put("result", "failed");
+        result.put("msg", "플랫폼이 선택되지 않았습니다.");
+
+        return result;
     }
 
     // 학생 추가 - Admin Client 전용

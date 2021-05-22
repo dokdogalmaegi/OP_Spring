@@ -2,6 +2,7 @@ package io.op.total.model;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -26,9 +27,9 @@ public class UtilServiceImpl implements UtilService {
             MessageDigest md = MessageDigest.getInstance("SHA-512");
             md.update(nowDate.getBytes());
 
-            String baseString = Base64.getEncoder().encodeToString(md.digest());
+            String hex = String.format("%0128x", new BigInteger(1, md.digest()));
 
-            if(baseString.equals(now)) {
+            if(hex.equals(now)) {
                 return true;
             }
 
