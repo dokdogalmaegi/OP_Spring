@@ -32,6 +32,8 @@ public class UserServiceImpl implements UserService {
 
     public List<Map<String, Object>> getClassNowLogs(int grade, int class_num) { return userRepository.getClassNowLogs(grade, class_num); }
 
+    public List<Map<String, Object>> getClassNotNowLogs(int grade, int class_num) { return userRepository.getClassNotNowLogs(grade, class_num); }
+
     public int insertLog(String email) { return userRepository.insertLog(email); }
 
     public int insertStudent(Student vo) { return userRepository.insertStudent(vo); }

@@ -16,6 +16,9 @@
   <select id="getClassNowLogs" parameterType="int" resultType="java.util.HashMap">
     select nm, time(join_date) as time from log l inner join student s on l.email = s.email where join_date like concat(DATE_FORMAT(now(), '%Y-%m-%d'), '%') and grade = #{grade} and class = #{class_num};
   </select>
+  <select id="getClassNotNowLogs" parameterType="int" resultType="java.util.HashMap">
+    select st.nm from student st left outer join (select l.email, nm, time(join_date) as time from log l inner join student s on l.email = s.email where join_date like concat(DATE_FORMAT(now(), '%Y-%m-%d'), '%') and grade = #{grade} and class = #{class_num}) lo on st.email = lo.email where lo.email is null and st.grade = #{grade} and st.class = #{class_num};
+  </select>
   <select id="checkStudent" parameterType="String" resultType="java.util.HashMap">
     select * from student where email = #{email} and pw = #{pw};
   </select>

@@ -20,6 +20,7 @@ public interface UserRepository {
     List<Map<String, Object>> checkToDayLog(String email);
     List<Map<String, Object>> checkAdmin(String email, String adminKey);
     List<Map<String, Object>> getClassNowLogs(int grade, int class_num);
+    List<Map<String, Object>> getClassNotNowLogs(int grade, int class_num);
     int insertLog(String email);
     int insertStudent(Student vo);
 }
