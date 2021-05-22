@@ -1,16 +1,13 @@
 package io.op.total.controller;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import io.op.total.model.UserService;
 import io.op.total.model.UtilServiceImpl;
-import io.op.total.vo.KakaoStudent;
 import io.op.total.vo.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.StringReader;
 import java.util.*;
 
 @RestController
@@ -37,11 +34,14 @@ public class StudentController {
 
         int count = 0;
 
-        for(Map<String, Object> vo : sqlMap) {
-            if(count == sqlMap.size() - 1) simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString();
-            else simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString() + "\n";
-            count++;
+        if(sqlMap.size() > 0) {
+            for(Map<String, Object> vo : sqlMap) {
+                if(count == sqlMap.size() - 1) simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString();
+                else simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString() + "\n";
+                count++;
+            }
         }
+        simpleText = "오늘 출석한 인원은 없습니다.";
 
         return utilService.kakaoChat(simpleText);
     }
@@ -50,18 +50,17 @@ public class StudentController {
     public Map getClassNowLogs(@RequestBody String params) {
         JsonParser jsonParser = new JsonParser();
 
-        JsonElement utterance = jsonParser.parse(params)
-                .getAsJsonObject().get("userRequest")
-                .getAsJsonObject().get("utterance");
+        JsonElement class_num = jsonParser.parse(params)
+                .getAsJsonObject().get("action")
+                .getAsJsonObject().get("params")
+                .getAsJsonObject().get("class_num");
 
         JsonElement grade = jsonParser.parse(params)
                 .getAsJsonObject().get("action")
                 .getAsJsonObject().get("params")
                 .getAsJsonObject().get("grade");
 
-        String class_num = utterance.toString().replaceAll("\"", "");
-
-        List<Map<String, Object>> sqlMap = userService.getClassNowLogs(grade.getAsInt(), Integer.parseInt(class_num.replaceAll("반", "")));
+        List<Map<String, Object>> sqlMap = userService.getClassNowLogs(grade.getAsInt(), class_num.getAsInt());
         String simpleText = " 이름   | 출석시간\n";
 
         int count = 0;
@@ -75,7 +74,7 @@ public class StudentController {
 
             return utilService.kakaoChat(simpleText);
         }
-        simpleText = "";
+        simpleText = "오늘 " + grade + "학년" + " " + class_num + "반에 출석한 인원은 없습니다.";
 
         return utilService.kakaoChat(simpleText);
     }
