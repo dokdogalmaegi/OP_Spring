@@ -13,6 +13,9 @@
   <select id="getNowLogs" resultType="java.util.HashMap">
     select nm, time(join_date) as time from log l inner join student u on l.email = u.email where join_date like concat(DATE_FORMAT(now(), '%Y-%m-%d'), '%');
   </select>
+  <select id="getClassNowLogs" parameterType="int" resultType="java.util.HashMap">
+    select nm, time(join_date) as time from log l inner join student s on l.email = s.email where join_date like concat(DATE_FORMAT(now(), '%Y-%m-%d'), '%') and grade = #{grade} and class = #{class_num};
+  </select>
   <select id="checkStudent" parameterType="String" resultType="java.util.HashMap">
     select * from student where email = #{email} and pw = #{pw};
   </select>

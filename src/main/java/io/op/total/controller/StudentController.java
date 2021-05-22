@@ -1,17 +1,16 @@
 package io.op.total.controller;
 
-import com.mysql.cj.protocol.Message;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import io.op.total.model.UserService;
+import io.op.total.model.UtilServiceImpl;
+import io.op.total.vo.KakaoStudent;
 import io.op.total.vo.Student;
-import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+import java.io.StringReader;
 import java.util.*;
 
 @RestController
@@ -20,66 +19,7 @@ public class StudentController {
     @Autowired
     private UserService userService;
 
-    public Boolean checkDate(String now) {
-        Calendar cal = Calendar.getInstance();
-        Date d = new Date(cal.getTimeInMillis());
-        SimpleDateFormat testDate = new SimpleDateFormat("yyyyMMdd");
-
-        String nowDate = testDate.format(d);
-
-        nowDate = nowDate + userService.solt;
-
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.update(nowDate.getBytes());
-
-            String baseString = Base64.getEncoder().encodeToString(md.digest());
-
-            if(baseString.equals(now)) {
-                return true;
-            }
-
-            return false;
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public String cryptoBase(String text) {
-        String result = "";
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-512");
-            md.update(text.getBytes());
-
-            result = Base64.getEncoder().encodeToString(md.digest());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
-    public Map kakaoChat(String simpleText) {
-        Map result = new HashMap<String, Object>();
-        Map outputs = new HashMap<String, Object>();
-        Map simpleTextMap = new HashMap<String, Object>();
-        Map textMap = new HashMap<String, Object>();
-        result.put("version", "2.0");
-
-        List<Map<String, Object>> sqlMap = userService.getNowLogs();
-
-        List<Map<String, Object>> list = new ArrayList<>();
-
-        textMap.put("text", simpleText);
-        simpleTextMap.put("simpleText", textMap);
-
-        list.add(simpleTextMap);
-
-        outputs.put("outputs", list);
-        result.put("template", outputs);
-
-        return result;
-    }
+    private final UtilServiceImpl utilService = new UtilServiceImpl();
 
     @GetMapping("/getStudent")
     public List<Map<String, Object>> getUsers() { return userService.getUsers(); }
@@ -89,6 +29,7 @@ public class StudentController {
         return userService.getLogs();
     }
 
+    // 당일 출석한 학생 전부를 조회
     @PostMapping("/getNowLogs")
     public Map getNowLogs() {
         List<Map<String, Object>> sqlMap = userService.getNowLogs();
@@ -102,7 +43,41 @@ public class StudentController {
             count++;
         }
 
-        return kakaoChat(simpleText);
+        return utilService.kakaoChat(simpleText);
+    }
+
+    @PostMapping("/getClassNowLogs")
+    public Map getClassNowLogs(@RequestBody String params) {
+        JsonParser jsonParser = new JsonParser();
+
+        JsonElement utterance = jsonParser.parse(params)
+                .getAsJsonObject().get("userRequest")
+                .getAsJsonObject().get("utterance");
+
+        JsonElement grade = jsonParser.parse(params)
+                .getAsJsonObject().get("action")
+                .getAsJsonObject().get("params")
+                .getAsJsonObject().get("grade");
+
+        String class_num = utterance.toString().replaceAll("\"", "");
+
+        List<Map<String, Object>> sqlMap = userService.getClassNowLogs(grade.getAsInt(), Integer.parseInt(class_num.replaceAll("반", "")));
+        String simpleText = " 이름   | 출석시간\n";
+
+        int count = 0;
+
+        if(sqlMap.size() > 0) {
+            for(Map<String, Object> vo : sqlMap) {
+                if(count == sqlMap.size() - 1) simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString();
+                else simpleText += vo.get("nm").toString() + " | " + vo.get("time").toString() + "\n";
+                count++;
+            }
+
+            return utilService.kakaoChat(simpleText);
+        }
+        simpleText = "";
+
+        return utilService.kakaoChat(simpleText);
     }
 
     // 학생 추가 - Admin Client 전용
@@ -110,14 +85,14 @@ public class StudentController {
     public Map insertStudent(@RequestBody HashMap<String, String> params) {
         Map result = new HashMap<String, Object>();
 
-        if(userService.checkAdmin(params.get("adminEmail"), cryptoBase(params.get("adminKey"))).size() == 0) {
+        if(userService.checkAdmin(params.get("adminEmail"), utilService.cryptoBase(params.get("adminKey"))).size() == 0) {
             result.put("result", "failed");
             result.put("msg", "당신은 어드민이 아닙니다.");
 
             return result;
         }
 
-        String email = params.get("email"); String pw = cryptoBase(params.get("pw")); String nm = params.get("nm"); int grade = Integer.parseInt(params.get("grade")); int class_num = Integer.parseInt(params.get("class_num")); int num = Integer.parseInt(params.get("num"));
+        String email = params.get("email"); String pw = utilService.cryptoBase(params.get("pw")); String nm = params.get("nm"); int grade = Integer.parseInt(params.get("grade")); int class_num = Integer.parseInt(params.get("class_num")); int num = Integer.parseInt(params.get("num"));
 
         if(email.equals("") || pw.equals("") || nm.equals("") || Integer.toString(grade).equals("") || Integer.toString(class_num).equals("") || Integer.toString(num).equals("") ) {
             result.put("result", "failed");
@@ -152,14 +127,14 @@ public class StudentController {
     public Map insertAttendance(@RequestBody HashMap<String, String> params, @PathVariable("nowDay") String nowDay) {
         Map result = new HashMap<String, Object>();
 
-        if(!checkDate(nowDay)) {
+        if(!utilService.checkDate(nowDay)) {
             result.put("result", "failed");
             result.put("msg", "주소가 맞지 않습니다.");
 
             return result;
         }
 
-        if(userService.checkStudent(params.get("email"), cryptoBase(params.get("pw"))).size() > 0) {
+        if(userService.checkStudent(params.get("email"), utilService.cryptoBase(params.get("pw"))).size() > 0) {
             if(userService.checkToDayLog(params.get("email")).size() > 0) {
                 result.put("result", "failed");
                 result.put("msg", "이미 출석이 완료 되었습니다.");

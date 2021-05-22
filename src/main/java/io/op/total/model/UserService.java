@@ -17,6 +17,7 @@ public interface UserService {
     List<Map<String, Object>> checkInsertStudent(String email);
     List<Map<String, Object>> checkToDayLog(String email);
     List<Map<String, Object>> checkAdmin(String email, String adminKey);
+    List<Map<String, Object>> getClassNowLogs(int grade, int class_num);
     int insertLog(String email);
     int insertStudent(Student vo);
 }

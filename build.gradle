@@ -15,7 +15,7 @@ configurations {
 }
 
 bootJar {
-    archiveVersion = "0.0.5"
+    archiveVersion = "0.0.7"
 }
 
 repositories {
@@ -24,6 +24,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.google.code.gson:gson:2.8.6'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
