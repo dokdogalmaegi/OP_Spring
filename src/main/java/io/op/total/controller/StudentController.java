@@ -218,6 +218,25 @@ public class StudentController {
         return result;
     }
 
+    @PostMapping("/checkTeacher")
+    public Map checkTeacher(@RequestBody HashMap<String, String> params) {
+        Map result = new HashMap<String, Object>();
+
+        List<Map<String, Object>> sqlMap = userService.checkAdmin(params.get("email").toString(), utilService.cryptoBase(params.get("pw").toString()));
+
+        if(sqlMap.size() > 0) {
+            result.put("result", "success");
+            result.put("check", "True");
+
+            return result;
+        }
+
+        result.put("result", "failed");
+        result.put("check", "False");
+
+        return result;
+    }
+
     @PostMapping("/addLog/{nowDay}")
     public Map insertAttendance(@RequestBody HashMap<String, String> params, @PathVariable("nowDay") String nowDay) {
         Map result = new HashMap<String, Object>();
