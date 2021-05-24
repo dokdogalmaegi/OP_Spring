@@ -29,6 +29,8 @@ public class UtilServiceImpl implements UtilService {
 
             String hex = String.format("%0128x", new BigInteger(1, md.digest()));
 
+            System.out.println(hex);
+
             if(hex.equals(now)) {
                 return true;
             }

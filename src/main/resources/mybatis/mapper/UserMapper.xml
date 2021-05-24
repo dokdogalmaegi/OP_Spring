@@ -20,13 +20,13 @@
     select st.nm from student st left outer join (select l.email, nm, time(join_date) as time from log l inner join student s on l.email = s.email where join_date like concat(DATE_FORMAT(now(), '%Y-%m-%d'), '%') and grade = #{grade} and class = #{class_num}) lo on st.email = lo.email where lo.email is null and st.grade = #{grade} and st.class = #{class_num};
   </select>
   <select id="checkStudent" parameterType="String" resultType="java.util.HashMap">
-    select * from student where email = #{email} and pw = #{pw};
+    select * from student where email = #{email} and pw = #{pw} and usim = #{usim};
   </select>
   <select id="checkInsertStudent" parameterType="String" resultType="java.util.HashMap">
     select * from student where email = #{email};
   </select>
   <select id="checkToDayLog" parameterType="String" resultType="java.util.HashMap">
-    select * from log where email = #{email} and join_date like concat(DATE_FORMAT(now(), '%Y-%m-%d'), '%');
+    select TIME_FORMAT(join_date, '%h:%i:%s') as time from log where email = #{email} and join_date like concat(DATE_FORMAT(now(), '%Y-%m-%d'), '%');
   </select>
   <select id="checkAdmin" parameterType="String" resultType="java.util.HashMap">
     select * from teacher where email = #{email} and adminKey = #{adminKey};
@@ -35,6 +35,6 @@
     insert into log(email, join_date) values (#{email}, now())
   </insert>
   <insert id="insertStudent" parameterType="io.op.total.vo.Student">
-    insert into student values (#{email}, #{pw}, #{nm}, #{grade}, #{class_num}, #{num});
+    insert into student values (#{email}, #{pw}, #{nm}, #{grade}, #{class_num}, #{num}, #{usim});
   </insert>
 </mapper>

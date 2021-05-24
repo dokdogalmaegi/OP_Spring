@@ -10,4 +10,5 @@ public class Student {
     private @NonNull int grade;
     private @NonNull int class_num;
     private @NonNull int num;
+    private @NonNull String usim;
 }

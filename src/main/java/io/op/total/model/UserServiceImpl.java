@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.getLogs();
     }
 
-    public List<Map<String, Object>> checkStudent(String email, String pw) { return userRepository.checkStudent(email, pw); }
+    public List<Map<String, Object>> checkStudent(String email, String pw, String usim) { return userRepository.checkStudent(email, pw, usim); }
 
     public List<Map<String, Object>> checkInsertStudent(String email) { return userRepository.checkInsertStudent(email); }
 

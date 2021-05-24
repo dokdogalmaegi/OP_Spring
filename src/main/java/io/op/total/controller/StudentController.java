@@ -187,9 +187,9 @@ public class StudentController {
             return result;
         }
 
-        String email = params.get("email"); String pw = utilService.cryptoBase(params.get("pw")); String nm = params.get("nm"); int grade = Integer.parseInt(params.get("grade")); int class_num = Integer.parseInt(params.get("class_num")); int num = Integer.parseInt(params.get("num"));
+        String email = params.get("email"); String pw = utilService.cryptoBase(params.get("pw")); String nm = params.get("nm"); int grade = Integer.parseInt(params.get("grade")); int class_num = Integer.parseInt(params.get("class_num")); int num = Integer.parseInt(params.get("num")); String usim = params.get("usim");
 
-        if(email.equals("") || pw.equals("") || nm.equals("") || Integer.toString(grade).equals("") || Integer.toString(class_num).equals("") || Integer.toString(num).equals("") ) {
+        if(email.equals("") || pw.equals("") || nm.equals("") || Integer.toString(grade).equals("") || Integer.toString(class_num).equals("") || Integer.toString(num).equals("") || usim.equals("")) {
             result.put("result", "failed");
             result.put("msg", "값이 누락 되었습니다.");
 
@@ -204,7 +204,7 @@ public class StudentController {
                 return result;
             }
 
-            Student vo = new Student(email, pw, nm, grade, class_num, num);
+            Student vo = new Student(email, pw, nm, grade, class_num, num, usim);
             userService.insertStudent(vo);
 
             result.put("result", "success");
@@ -248,10 +248,14 @@ public class StudentController {
             return result;
         }
 
-        if(userService.checkStudent(params.get("email"), utilService.cryptoBase(params.get("pw"))).size() > 0) {
-            if(userService.checkToDayLog(params.get("email")).size() > 0) {
-                result.put("result", "failed");
+        System.out.println(userService.checkStudent(params.get("email"), utilService.cryptoBase(params.get("pw")), utilService.cryptoBase(params.get("usim"))));
+
+        if(userService.checkStudent(params.get("email"), utilService.cryptoBase(params.get("pw")), utilService.cryptoBase(params.get("usim"))).size() > 0) {
+            List<Map<String, Object>> logs = userService.checkToDayLog(params.get("email"));
+            if(logs.size() > 0) {
+                result.put("result", "already");
                 result.put("msg", "이미 출석이 완료 되었습니다.");
+                result.put("time", logs.get(0).get("time"));
 
                 return result;
             }
