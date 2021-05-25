@@ -187,9 +187,9 @@ public class StudentController {
             return result;
         }
 
-        String email = params.get("email"); String pw = utilService.cryptoBase(params.get("pw")); String nm = params.get("nm"); int grade = Integer.parseInt(params.get("grade")); int class_num = Integer.parseInt(params.get("class_num")); int num = Integer.parseInt(params.get("num")); String usim = params.get("usim");
+        String email = params.get("email"); String pw = utilService.cryptoBase(params.get("pw")); String nm = params.get("nm"); int grade = Integer.parseInt(params.get("grade")); int class_num = Integer.parseInt(params.get("class_num")); int num = Integer.parseInt(params.get("num")); String phone = params.get("phone");
 
-        if(email.equals("") || pw.equals("") || nm.equals("") || Integer.toString(grade).equals("") || Integer.toString(class_num).equals("") || Integer.toString(num).equals("") || usim.equals("")) {
+        if(email.equals("") || pw.equals("") || nm.equals("") || Integer.toString(grade).equals("") || Integer.toString(class_num).equals("") || Integer.toString(num).equals("") || phone.equals("")) {
             result.put("result", "failed");
             result.put("msg", "값이 누락 되었습니다.");
 
@@ -204,7 +204,7 @@ public class StudentController {
                 return result;
             }
 
-            Student vo = new Student(email, pw, nm, grade, class_num, num, usim);
+            Student vo = new Student(email, pw, nm, grade, class_num, num, phone);
             userService.insertStudent(vo);
 
             result.put("result", "success");
@@ -249,9 +249,9 @@ public class StudentController {
             return result;
         }
 
-        System.out.println(userService.checkStudent(params.get("email"), utilService.cryptoBase(params.get("pw")), utilService.cryptoBase(params.get("usim"))));
+        System.out.println(userService.checkStudent(params.get("email"), utilService.cryptoBase(params.get("pw")), utilService.cryptoBase(params.get("phone"))));
 
-        if(userService.checkStudent(params.get("email"), utilService.cryptoBase(params.get("pw")), utilService.cryptoBase(params.get("usim"))).size() > 0) {
+        if(userService.checkStudent(params.get("email"), utilService.cryptoBase(params.get("pw")), params.get("phone")).size() > 0) {
             List<Map<String, Object>> logs = userService.checkToDayLog(params.get("email"));
             if(logs.size() > 0) {
                 result.put("result", "already");
@@ -261,8 +261,10 @@ public class StudentController {
                 return result;
             }
             userService.insertLog(params.get("email"));
+            List<Map<String, Object>> sqlMap2 = userService.checkOnline(params.get("email"));
             result.put("result", "success");
             result.put("msg", "성공적으로 출석이 완료 되었습니다.");
+            result.put("online_flag", sqlMap2.get(0).get("onlineFlag"));
 
             return result;
         }

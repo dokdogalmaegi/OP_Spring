@@ -22,13 +22,15 @@ public class UserServiceImpl implements UserService {
         return userRepository.getLogs();
     }
 
-    public List<Map<String, Object>> checkStudent(String email, String pw, String usim) { return userRepository.checkStudent(email, pw, usim); }
+    public List<Map<String, Object>> checkStudent(String email, String pw, String phone) { return userRepository.checkStudent(email, pw, phone); }
 
     public List<Map<String, Object>> checkInsertStudent(String email) { return userRepository.checkInsertStudent(email); }
 
     public List<Map<String, Object>> checkToDayLog(String email) { return userRepository.checkToDayLog(email); }
 
     public List<Map<String, Object>> checkAdmin(String email, String adminKey) { return userRepository.checkAdmin(email, adminKey); }
+
+    public List<Map<String, Object>> checkOnline(String email) { return userRepository.checkOnline(email); }
 
     public List<Map<String, Object>> getClassNowLogs(int grade, int class_num) { return userRepository.getClassNowLogs(grade, class_num); }
 
