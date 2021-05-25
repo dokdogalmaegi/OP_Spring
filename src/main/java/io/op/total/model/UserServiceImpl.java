@@ -22,6 +22,8 @@ public class UserServiceImpl implements UserService {
         return userRepository.getLogs();
     }
 
+    public List<Map<String, Object>> getNowNotLogs() { return userRepository.getNowNotLogs(); }
+
     public List<Map<String, Object>> checkStudent(String email, String pw, String phone) { return userRepository.checkStudent(email, pw, phone); }
 
     public List<Map<String, Object>> checkInsertStudent(String email) { return userRepository.checkInsertStudent(email); }

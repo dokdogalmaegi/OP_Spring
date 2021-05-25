@@ -15,6 +15,7 @@ public interface UserRepository {
     List<Map<String, Object>> getUsers();
     List<Map<String, Object>> getLogs();
     List<Map<String, Object>> getNowLogs();
+    List<Map<String, Object>> getNowNotLogs();
     List<Map<String, Object>> checkStudent(String email, String pw, String phone);
     List<Map<String, Object>> checkInsertStudent(String email);
     List<Map<String, Object>> checkToDayLog(String email);

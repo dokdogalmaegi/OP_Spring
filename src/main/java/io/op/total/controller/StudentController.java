@@ -61,6 +61,43 @@ public class StudentController {
         return result;
     }
 
+    @PostMapping("/getNowNotLogs/{platform}")
+    public Map getNowNotLogs(@PathVariable String platform) {
+        List<Map<String, Object>> sqlMap = userService.getNowNotLogs();
+        Map result = new HashMap<String, Object>();
+        if(platform.equals("kakao")) {
+            String simpleText = " 학년 | 반 | 수업 | 이름 \n";
+
+            int count = 0;
+
+            if(sqlMap.size() > 0) {
+                String onlineFlag = "오프라인";
+                for(Map<String, Object> vo : sqlMap) {
+                    if((Boolean) vo.get("onlineFlag")) onlineFlag = "온라인";
+
+                    if(count == sqlMap.size() - 1) simpleText += vo.get("grade").toString() + " | " + vo.get("class").toString() + " | " + onlineFlag + " | " + vo.get("nm").toString();
+                    else simpleText += simpleText += vo.get("grade").toString() + " | " + vo.get("class").toString() + " | " + onlineFlag + " | " + vo.get("nm").toString() + "\n";
+                    count++;
+                }
+                result = utilService.kakaoChat(simpleText);
+
+                return result;
+            }
+            simpleText = "오늘 결석한 인원은 없습니다.";
+            result = utilService.kakaoChat(simpleText);
+            return result;
+        }
+        if(platform.equals("csharp")) {
+            result.put("Students", sqlMap);
+
+            return result;
+        }
+        result.put("result", "failed");
+        result.put("msg", "플랫폼이 선택되지 않았습니다.");
+
+        return result;
+    }
+
     @PostMapping("/getClassNowNotLogs/{platform}")
     public Map getClassNowNotLogs(@RequestBody String params, @PathVariable String platform) {
         Map result = new HashMap<String, Object>();
@@ -261,15 +298,36 @@ public class StudentController {
                 return result;
             }
             userService.insertLog(params.get("email"));
-            List<Map<String, Object>> sqlMap2 = userService.checkOnline(params.get("email"));
             result.put("result", "success");
             result.put("msg", "성공적으로 출석이 완료 되었습니다.");
-            result.put("online_flag", sqlMap2.get(0).get("onlineFlag"));
 
             return result;
         }
         result.put("result", "failed");
         result.put("msg", "아이디 또는 비밀번호가 존재하지 않습니다.");
+
+        return result;
+    }
+
+    @PostMapping("/checkOnline")
+    public Map checkOnline(@RequestBody HashMap<String, String> params) {
+        Map result = new HashMap<String, Object>();
+
+        try {
+            List<Map<String, Object>> sqlMap = userService.checkOnline(params.get("email"));
+
+            if(sqlMap.size() > 0) {
+                result.put("result", "success");
+                result.put("online_flag", sqlMap.get(0).get("onlineFlag"));
+            } else {
+                result.put("result", "failed");
+                result.put("msg", "이메일과 일치하는 학생이 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("result", "failed");
+            result.put("msg", "잘못된 요청입니다.");
+        }
 
         return result;
     }
