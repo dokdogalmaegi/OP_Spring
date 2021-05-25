@@ -227,6 +227,7 @@ public class StudentController {
         if(sqlMap.size() > 0) {
             result.put("result", "success");
             result.put("check", "True");
+            result.put("name", sqlMap.get(0).get("nm"));
 
             return result;
         }
