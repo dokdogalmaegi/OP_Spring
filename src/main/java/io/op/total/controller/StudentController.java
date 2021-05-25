@@ -265,6 +265,9 @@ public class StudentController {
             result.put("result", "success");
             result.put("check", "True");
             result.put("name", sqlMap.get(0).get("nm"));
+            result.put("grade", sqlMap.get(0).get("grade"));
+            result.put("class", sqlMap.get(0).get("class_num"));
+            result.put("permission", sqlMap.get(0).get("permission"));
 
             return result;
         }
