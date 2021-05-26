@@ -41,4 +41,6 @@ public class UserServiceImpl implements UserService {
     public int insertLog(String email) { return userRepository.insertLog(email); }
 
     public int insertStudent(Student vo) { return userRepository.insertStudent(vo); }
+
+    public int updateStudent(String pw, String phone, String email) { return userRepository.updateStudent(pw, phone, email); }
 }

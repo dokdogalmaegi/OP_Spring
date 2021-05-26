@@ -25,4 +25,5 @@ public interface UserRepository {
     List<Map<String, Object>> getClassNotNowLogs(int grade, int class_num);
     int insertLog(String email);
     int insertStudent(Student vo);
+    int updateStudent(String pw, String phone, String email);
 }

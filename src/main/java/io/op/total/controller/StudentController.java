@@ -61,6 +61,7 @@ public class StudentController {
         return result;
     }
 
+    // 당일 결석한 학생 전부를 조회
     @PostMapping("/getNowNotLogs/{platform}")
     public Map getNowNotLogs(@PathVariable String platform) {
         List<Map<String, Object>> sqlMap = userService.getNowNotLogs();
@@ -98,6 +99,7 @@ public class StudentController {
         return result;
     }
 
+    // 당일 결석한 학생을 Request에 담겨진 학년과 반으로 조회
     @PostMapping("/getClassNowNotLogs/{platform}")
     public Map getClassNowNotLogs(@RequestBody String params, @PathVariable String platform) {
         Map result = new HashMap<String, Object>();
@@ -155,6 +157,7 @@ public class StudentController {
         return result;
     }
 
+    // 당일 출석한 학생을 Request에 담겨진 학년과 반으로 조회
     @PostMapping("/getClassNowLogs/{platform}")
     public Map getClassNowLogs(@RequestBody String params, @PathVariable String platform) {
         Map result = new HashMap<String, Object>();
@@ -224,9 +227,21 @@ public class StudentController {
             return result;
         }
 
-        String email = params.get("email"); String pw = utilService.cryptoBase(params.get("pw")); String nm = params.get("nm"); int grade = Integer.parseInt(params.get("grade")); int class_num = Integer.parseInt(params.get("class_num")); int num = Integer.parseInt(params.get("num")); String phone = params.get("phone");
+        String email = params.get("email");
+        String pw; String phone;
 
-        if(email.equals("") || pw.equals("") || nm.equals("") || Integer.toString(grade).equals("") || Integer.toString(class_num).equals("") || Integer.toString(num).equals("") || phone.equals("")) {
+        if(params.get("pw").toString().equals("")) pw = "";
+        else pw = utilService.cryptoBase(params.get("pw"));
+
+        String nm = params.get("nm");
+        int grade = Integer.parseInt(params.get("grade"));
+        int class_num = Integer.parseInt(params.get("class_num"));
+        int num = Integer.parseInt(params.get("num"));
+
+        if(params.get("phone").toString().equals("")) phone = "";
+        else phone = params.get("phone");
+
+        if(email.equals("") ||  nm.equals("") || Integer.toString(grade).equals("") || Integer.toString(class_num).equals("") || Integer.toString(num).equals("")) {
             result.put("result", "failed");
             result.put("msg", "값이 누락 되었습니다.");
 
@@ -281,6 +296,7 @@ public class StudentController {
     @PostMapping("/addLog/{nowDay}")
     public Map insertAttendance(@RequestBody HashMap<String, String> params, @PathVariable("nowDay") String nowDay) {
         Map result = new HashMap<String, Object>();
+        Boolean changed = false;
 
         if(!utilService.checkDate(nowDay)) {
             result.put("result", "failed");
@@ -289,7 +305,16 @@ public class StudentController {
             return result;
         }
 
-        System.out.println(userService.checkStudent(params.get("email"), utilService.cryptoBase(params.get("pw")), utilService.cryptoBase(params.get("phone"))));
+        if(params.get("isNull").equals("True")) {
+            try {
+                userService.updateStudent(utilService.cryptoBase(params.get("pw")), params.get("phone"), params.get("email"));;
+
+                changed = !changed;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
 
         if(userService.checkStudent(params.get("email"), utilService.cryptoBase(params.get("pw")), params.get("phone")).size() > 0) {
             List<Map<String, Object>> logs = userService.checkToDayLog(params.get("email"));
@@ -300,9 +325,11 @@ public class StudentController {
 
                 return result;
             }
+
             userService.insertLog(params.get("email"));
             result.put("result", "success");
-            result.put("msg", "성공적으로 출석이 완료 되었습니다.");
+            if(changed) result.put("msg", "출석과 계정 등록이 완료 되었습니다.");
+            else result.put("msg", "성공적으로 출석이 완료 되었습니다.");
 
             return result;
         }
@@ -320,8 +347,11 @@ public class StudentController {
             List<Map<String, Object>> sqlMap = userService.checkOnline(params.get("email"));
 
             if(sqlMap.size() > 0) {
+                List<Map<String, Object>> sqlMap2 = userService.checkInsertStudent(params.get("email"));
                 result.put("result", "success");
                 result.put("online_flag", sqlMap.get(0).get("onlineFlag"));
+                result.put("pw", sqlMap2.get(0).get("pw"));
+                result.put("phone", sqlMap2.get(0).get("phone"));
             } else {
                 result.put("result", "failed");
                 result.put("msg", "이메일과 일치하는 학생이 없습니다.");
