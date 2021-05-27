@@ -41,7 +41,7 @@
     insert into log(email, join_date) values (#{email}, now())
   </insert>
   <insert id="insertStudent" parameterType="io.op.total.vo.Student">
-    insert into student values (#{email}, #{pw}, #{nm}, #{grade}, #{class_num}, #{num}, #{phone});
+    insert into student values (#{email}, #{pw}, #{nm}, #{grade}, #{class_num}, #{num}, #{phone}, false);
   </insert>
   <update id="updateStudent" parameterType="String">
     update student set pw = #{pw}, phone = #{phone} where email = #{email};
