@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import io.op.total.model.UserService;
 import io.op.total.model.UtilServiceImpl;
 import io.op.total.vo.Student;
+import io.op.total.vo.UpdateStudent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -261,6 +262,64 @@ public class StudentController {
 
             result.put("result", "success");
             result.put("msg", "정상적으로 학생이 추가 되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("result", "failed");
+            result.put("msg", "알 수 없는 에러가 발생 했습니다.");
+        }
+
+        return result;
+    }
+
+    @PostMapping("/updateStudent")
+    public Map updateStudent(@RequestBody HashMap<String, String> params) {
+        Map result = new HashMap<String, Object>();
+
+        if(userService.checkAdmin(params.get("adminEmail"), utilService.cryptoBase(params.get("adminKey"))).size() == 0) {
+            result.put("result", "failed");
+            result.put("msg", "당신은 어드민이 아닙니다.");
+
+            return result;
+        }
+
+        String email = params.get("email");
+        String pw; String phone; boolean flag = false;
+
+        if(params.get("pw").toString().equals("")) pw = "";
+        else pw = utilService.cryptoBase(params.get("pw"));
+
+        String nm = params.get("nm");
+        int grade = Integer.parseInt(params.get("grade"));
+        int class_num = Integer.parseInt(params.get("class_num"));
+        int num = Integer.parseInt(params.get("num"));
+
+        if(params.get("phone").toString().equals("")) phone = "";
+        else phone = params.get("phone");
+
+        if(params.get("flag").toString().equals("true")) flag = true;
+
+        String changeEmail = params.get("changeEmail");
+
+        if(email.equals("") ||  nm.equals("") || Integer.toString(grade).equals("") || Integer.toString(class_num).equals("") || Integer.toString(num).equals("")) {
+            result.put("result", "failed");
+            result.put("msg", "값이 누락 되었습니다.");
+
+            return result;
+        }
+        try {
+
+            if(userService.checkInsertStudent(changeEmail).size() > 0) {
+                result.put("result", "failed");
+                result.put("msg", "수정하려는 이메일이 이미 존재하는 이메일입니다.");
+
+                return result;
+            }
+
+            UpdateStudent vo = new UpdateStudent(email, pw, nm, grade, class_num, num, phone, flag, changeEmail);
+            userService.updateStudentCsharp(vo);
+
+            result.put("result", "success");
+            result.put("msg", "정상적으로 학생이 수정 되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();
             result.put("result", "failed");

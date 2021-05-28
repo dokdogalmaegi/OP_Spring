@@ -1,6 +1,7 @@
 package io.op.total.model;
 
 import io.op.total.vo.Student;
+import io.op.total.vo.UpdateStudent;
 
 import java.util.List;
 import java.util.Map;
@@ -24,4 +25,5 @@ public interface UserService {
     int insertLog(String email);
     int insertStudent(Student vo);
     int updateStudent(String pw, String phone, String email);
+    int updateStudentCsharp(UpdateStudent vo);
 }

@@ -1,6 +1,7 @@
 package io.op.total.domain;
 
 import io.op.total.vo.Student;
+import io.op.total.vo.UpdateStudent;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -26,4 +27,5 @@ public interface UserRepository {
     int insertLog(String email);
     int insertStudent(Student vo);
     int updateStudent(String pw, String phone, String email);
+    int updateStudentCsharp(UpdateStudent vo);
 }

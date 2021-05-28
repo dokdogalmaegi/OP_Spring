@@ -2,6 +2,7 @@ package io.op.total.model;
 
 import io.op.total.domain.UserRepository;
 import io.op.total.vo.Student;
+import io.op.total.vo.UpdateStudent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,4 +44,6 @@ public class UserServiceImpl implements UserService {
     public int insertStudent(Student vo) { return userRepository.insertStudent(vo); }
 
     public int updateStudent(String pw, String phone, String email) { return userRepository.updateStudent(pw, phone, email); }
+
+    public int updateStudentCsharp(UpdateStudent vo) { return userRepository.updateStudentCsharp(vo); }
 }
