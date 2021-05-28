@@ -49,4 +49,7 @@
   <update id="updateStudentCsharp" parameterType="io.op.total.vo.UpdateStudent">
     update student set email = #{changeEmail}, pw = #{pw}, nm = #{nm}, grade = #{grade}, class = #{class_num}, num = #{num}, phone = #{phone}, onlineFlag = #{flag} where email = #{email};
   </update>
+  <delete id="deleteStudent" parameterType="String">
+    delete from student where email = #{email};
+  </delete>
 </mapper>

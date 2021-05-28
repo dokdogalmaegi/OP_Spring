@@ -46,4 +46,6 @@ public class UserServiceImpl implements UserService {
     public int updateStudent(String pw, String phone, String email) { return userRepository.updateStudent(pw, phone, email); }
 
     public int updateStudentCsharp(UpdateStudent vo) { return userRepository.updateStudentCsharp(vo); }
+
+    public int deleteStudent(String email) { return userRepository.deleteStudent(email); }
 }

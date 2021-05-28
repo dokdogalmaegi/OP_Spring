@@ -28,4 +28,5 @@ public interface UserRepository {
     int insertStudent(Student vo);
     int updateStudent(String pw, String phone, String email);
     int updateStudentCsharp(UpdateStudent vo);
+    int deleteStudent(String email);
 }

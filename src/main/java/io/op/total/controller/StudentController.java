@@ -425,4 +425,44 @@ public class StudentController {
 
         return result;
     }
+
+    @PostMapping("/deleteStudent")
+    public Map deleteStudent(@RequestBody HashMap<String, String> params){
+        Map result = new HashMap<String, Object>();
+
+        if(userService.checkAdmin(params.get("adminEmail"), utilService.cryptoBase(params.get("adminKey"))).size() == 0) {
+            result.put("result", "failed");
+            result.put("msg", "당신은 어드민이 아닙니다.");
+
+            return result;
+        }
+
+        String email = params.get("email");
+
+        if(email.equals("")) {
+            result.put("result", "failed");
+            result.put("msg", "이메일이 누락 되었습니다.");
+
+            return result;
+        }
+        try {
+
+            if(userService.checkInsertStudent(email).size() <= 0) {
+                result.put("result", "failed");
+                result.put("msg", "존재하지 않는 이메일입니다.");
+
+                return result;
+            }
+            userService.deleteStudent(email);
+
+            result.put("result", "success");
+            result.put("msg", "정상적으로 학생이 삭제 되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("result", "failed");
+            result.put("msg", "알 수 없는 에러가 발생 했습니다.");
+        }
+
+        return result;
+    }
 }
