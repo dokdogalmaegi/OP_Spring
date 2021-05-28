@@ -9,6 +9,7 @@ import io.op.total.vo.UpdateStudent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.*;
 
 @RestController
@@ -308,12 +309,13 @@ public class StudentController {
         }
         try {
 
-            if(userService.checkInsertStudent(changeEmail).size() > 0) {
-                result.put("result", "failed");
-                result.put("msg", "수정하려는 이메일이 이미 존재하는 이메일입니다.");
+//            if(userService.checkInsertStudent(changeEmail).size() > 0) {
+//                result.put("result", "failed");
+//                result.put("msg", "수정하려는 이메일이 이미 존재하는 이메일입니다.");
+//
+//                return result;
+//            }
 
-                return result;
-            }
 
             UpdateStudent vo = new UpdateStudent(email, pw, nm, grade, class_num, num, phone, flag, changeEmail);
             userService.updateStudentCsharp(vo);
