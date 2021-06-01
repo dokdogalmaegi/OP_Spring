@@ -28,8 +28,21 @@ public class StudentController {
     // 당일 출석한 학생 전부를 조회
     @PostMapping("/getNowLogs/{platform}")
     public Map getNowLogs(@PathVariable String platform) {
-        List<Map<String, Object>> sqlMap = userService.getNowLogs();
+        List<Map<String, Object>> sqlMap = null;
         Map result = new HashMap<String, Object>();
+
+        try {
+            sqlMap = userService.getNowLogs();
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            result.put("result", "failed");
+            result.put("msg", "잘못된 요청입니다.");
+
+            return result;
+        }
+
+
         if(platform.equals("kakao")) {
             String simpleText = " 이름   | 출석시간\n";
 
@@ -63,8 +76,20 @@ public class StudentController {
     // 당일 결석한 학생 전부를 조회
     @PostMapping("/getNowNotLogs/{platform}")
     public Map getNowNotLogs(@PathVariable String platform) {
-        List<Map<String, Object>> sqlMap = userService.getNowNotLogs();
+        List<Map<String, Object>> sqlMap = null;
         Map result = new HashMap<String, Object>();
+
+        try {
+            sqlMap = userService.getNowNotLogs();
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            result.put("result", "failed");
+            result.put("msg", "잘못된 요청입니다.");
+
+            return result;
+        }
+
         if(platform.equals("kakao")) {
             String simpleText = " 학년 | 반 | 수업 | 이름 \n";
 
@@ -115,7 +140,17 @@ public class StudentController {
                     .getAsJsonObject().get("params")
                     .getAsJsonObject().get("grade");
 
-            List<Map<String, Object>> sqlMap = userService.getClassNotNowLogs(grade.getAsInt(), class_num.getAsInt());
+            List<Map<String, Object>> sqlMap = null;
+            try {
+                sqlMap = userService.getClassNotNowLogs(grade.getAsInt(), class_num.getAsInt());
+            } catch (Exception e) {
+                e.printStackTrace();
+
+                result.put("result", "failed");
+                result.put("msg", "잘못된 요청입니다.");
+
+                return result;
+            }
             String simpleText = " 이름\n";
 
             int count = 0;
@@ -144,7 +179,17 @@ public class StudentController {
             JsonElement grade = jsonParser.parse(params)
                     .getAsJsonObject().get("grade");
 
-            List<Map<String, Object>> nowStudentList = userService.getClassNotNowLogs(grade.getAsInt(), class_num.getAsInt());
+            List<Map<String, Object>> nowStudentList = null;
+            try {
+                nowStudentList = userService.getClassNotNowLogs(grade.getAsInt(), class_num.getAsInt());
+            } catch (Exception e) {
+                e.printStackTrace();
+
+                result.put("result", "failed");
+                result.put("msg", "잘못된 요청입니다.");
+
+                return result;
+            }
 
             result.put("Students", nowStudentList);
 
@@ -173,7 +218,17 @@ public class StudentController {
                     .getAsJsonObject().get("params")
                     .getAsJsonObject().get("grade");
 
-            List<Map<String, Object>> sqlMap = userService.getClassNowLogs(grade.getAsInt(), class_num.getAsInt());
+            List<Map<String, Object>> sqlMap = null;
+            try {
+                sqlMap = userService.getClassNowLogs(grade.getAsInt(), class_num.getAsInt());
+            } catch (Exception e) {
+                e.printStackTrace();
+
+                result.put("result", "failed");
+                result.put("msg", "잘못된 요청입니다.");
+
+                return result;
+            }
             String simpleText = " 이름   | 출석시간\n";
 
             int count = 0;
@@ -202,10 +257,16 @@ public class StudentController {
             JsonElement grade = jsonParser.parse(params)
                     .getAsJsonObject().get("grade");
 
-            List<Map<String, Object>> sqlMap = userService.getClassNowLogs(grade.getAsInt(), class_num.getAsInt());
+            try {
+                List<Map<String, Object>> sqlMap = userService.getClassNowLogs(grade.getAsInt(), class_num.getAsInt());
 
-            result.put("Students", sqlMap);
+                result.put("Students", sqlMap);
+            } catch (Exception e) {
+                e.printStackTrace();
 
+                result.put("result", "failed");
+                result.put("msg", "잘못된 요청입니다.");
+            }
             return result;
         }
         result.put("result", "failed");
@@ -238,7 +299,12 @@ public class StudentController {
         }
 
         if(userService.checkStudent(params.get("email"), utilService.cryptoBase(params.get("pw")), params.get("phone")).size() > 0) {
-            List<Map<String, Object>> logs = userService.checkToDayLog(params.get("email"));
+            List<Map<String, Object>> logs = null;
+            try {
+                logs = userService.checkToDayLog(params.get("email"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             if(logs.size() > 0) {
                 result.put("result", "already");
                 result.put("msg", "이미 출석이 완료 되었습니다.");
@@ -247,12 +313,18 @@ public class StudentController {
                 return result;
             }
 
-            userService.insertLog(params.get("email"));
-            result.put("result", "success");
-            if(changed) result.put("msg", "출석과 계정 등록이 완료 되었습니다.");
-            else result.put("msg", "성공적으로 출석이 완료 되었습니다.");
+            try {
+                userService.insertLog(params.get("email"));
+                result.put("result", "success");
+                if(changed) result.put("msg", "출석과 계정 등록이 완료 되었습니다.");
+                else result.put("msg", "성공적으로 출석이 완료 되었습니다.");
 
-            return result;
+                return result;
+            } catch (Exception e) {
+                e.printStackTrace();
+                result.put("result", "failed");
+                result.put("msg", "잘못된 요청입니다.");
+            }
         }
         result.put("result", "failed");
         result.put("msg", "아이디 또는 비밀번호가 존재하지 않습니다.");

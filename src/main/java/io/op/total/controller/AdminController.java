@@ -34,7 +34,7 @@ public class AdminController {
         }
 
         String email = params.get("email");
-        String pw; String phone; boolean flag = false;
+        String pw = null; String phone = null; boolean flag = false;
 
         if(params.get("pw").toString().equals("")) pw = "";
         else pw = utilService.cryptoBase(params.get("pw"));
